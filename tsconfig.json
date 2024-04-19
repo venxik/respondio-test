@@ -11,7 +11,9 @@
       "@Stores": ["stores"],
       "@Stores/*": ["stores/*"],
       "@Model": ["model"],
-      "@Model/*": ["model/*"]
+      "@Model/*": ["model/*"],
+      "@Utils/*": ["utils/*"],
+      "@Queries/*": ["queries/*"]
     }
   }
 }

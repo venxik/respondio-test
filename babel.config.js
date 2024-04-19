@@ -16,6 +16,8 @@ module.exports = function (api) {
             '@Components': './src/components',
             '@Screens': './src/screens',
             '@Stores': './src/stores',
+            '@Utils': './src/utils',
+            '@Queries': './src/queries',
             '@Assets': './assets',
           },
           extensions: ['.js', '.jsx', '.ts', '.tsx'],

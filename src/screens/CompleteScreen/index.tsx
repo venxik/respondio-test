@@ -1,68 +1,103 @@
 import AnimeItemList from '@Components/AnimeItemList';
-import {AnimeItem} from '@Model/api';
-import {useGetAnime} from 'queries/useGetAnime';
-import React, {useCallback, useState} from 'react';
-import {View, Text, StyleSheet, FlatList} from 'react-native';
-import {ActivityIndicator, Searchbar} from 'react-native-paper';
+import FlatlistEmpty from '@Components/FlatlistEmpty';
+import FlatlistError from '@Components/FlatlistError';
+import FlatlistLoading from '@Components/FlatlistLoading';
+import { AnimeItem } from '@Model/api';
+import { useGetAnime } from '@Queries/useGetAnime';
+import { debounce } from '@Utils/debounce';
+import React, { useCallback, useMemo, useState } from 'react';
+import { View, StyleSheet, FlatList } from 'react-native';
+import { Searchbar } from 'react-native-paper';
 
 const CompleteScreen = () => {
-  const [searchValue, setsearchValue] = useState('');
+  const [searchValue, setSearchValue] = useState('');
+  const [queryValue, setQueryValue] = useState('');
 
-  const {data, error} = useGetAnime({status: 'complete'});
+  const {
+    data,
+    error,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+    isLoading: isLoadingQuery,
+  } = useGetAnime({ status: 'complete', q: queryValue });
 
-  const renderItem = useCallback(({item}: {item: AnimeItem}) => {
+  const animeData = useMemo(
+    () => data?.pages.flatMap((page) => page.data),
+    [data],
+  );
+
+  const loadMoreData = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, fetchNextPage]);
+
+  const renderItem = useCallback(({ item }: { item: AnimeItem }) => {
     return <AnimeItemList data={item} />;
   }, []);
 
+  const debouncedSearch = debounce(setQueryValue, 2000);
+
+  const handleSearch = (text: string) => {
+    setSearchValue(text);
+    debouncedSearch(text);
+  };
+
   const renderHeaderComponent = useCallback(() => {
     return (
-      <View>
-        <Searchbar
-          value={searchValue}
-          placeholder={'Search Anime'}
-          onChangeText={setsearchValue}
-          style={styles.searchContainer}
-          // onIconPress={() => fetchData(true)}
-          // onSubmitEditing={() => fetchData(true)}
-        />
-      </View>
+      <Searchbar
+        value={searchValue}
+        placeholder={'Search Anime'}
+        onChangeText={handleSearch}
+        style={styles.searchContainer}
+      />
     );
   }, [searchValue]);
 
   const renderSeparator = useCallback(() => {
-    return <View style={{height: 6}} />;
+    return <View style={{ height: 6 }} />;
   }, []);
 
+  const renderIsFetchingMore = useCallback(() => {
+    if (isFetchingNextPage) {
+      return renderLoadingIndicator();
+    } else return null;
+  }, [isFetchingNextPage]);
+
   const renderLoadingIndicator = useCallback(() => {
-    return (
-      <View style={styles.loadingIndicator}>
-        <ActivityIndicator size={30} />
-      </View>
-    );
+    return <FlatlistLoading />;
   }, []);
 
   const renderEmpty = useCallback(() => {
-    return (
-      <View style={styles.emptyContainer}>
-        <Text>No Anime Available!</Text>
-      </View>
-    );
+    if (isLoadingQuery) {
+      return renderLoadingIndicator();
+    }
+    return <FlatlistEmpty />;
+  }, [isLoadingQuery]);
+
+  const renderError = useCallback(() => {
+    return <FlatlistError message={error?.message} />;
   }, []);
 
   return (
     <View style={styles.container}>
-      {data?.data && (
+      {!animeData && error && renderError()}
+      <View style={{ flex: 1, width: '100%', height: '100%' }}>
+        {renderHeaderComponent()}
         <FlatList
-          data={data?.data}
+          data={animeData}
           renderItem={renderItem}
           keyExtractor={(item) => item.mal_id.toString()}
           style={styles.flatlistContainer}
-          ListHeaderComponent={renderHeaderComponent}
+          contentContainerStyle={{ paddingBottom: 20 }}
           ListEmptyComponent={renderEmpty}
-          ListFooterComponent={renderLoadingIndicator}
+          ListFooterComponent={renderIsFetchingMore}
           ItemSeparatorComponent={renderSeparator}
+          onEndReached={loadMoreData}
+          onEndReachedThreshold={0.0001}
         />
-      )}
+      </View>
     </View>
   );
 };
@@ -74,13 +109,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   flatlistContainer: {
+    flex: 1,
     width: '100%',
     height: '100%',
-    paddingHorizontal: 10,
+    padding: 10,
   },
-  searchContainer: {marginVertical: 10},
-  emptyContainer: {alignItems: 'center', marginTop: 40},
-  loadingIndicator: {paddingVertical: 10, justifyContent: 'center'},
+  searchContainer: { margin: 10 },
 });
 
 export default CompleteScreen;
