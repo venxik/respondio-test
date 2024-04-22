@@ -95,7 +95,7 @@ const UpcomingScreen = () => {
           ListFooterComponent={renderIsFetchingMore}
           ItemSeparatorComponent={renderSeparator}
           onEndReached={loadMoreData}
-          onEndReachedThreshold={0.0001}
+          scrollEventThrottle={16}
         />
       </View>
     </View>

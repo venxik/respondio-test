@@ -4,7 +4,7 @@ import { RootStackScreenProps } from '@Model/navigation';
 import { useGetAnimeDetails } from '@Queries/useGetAnimeDetails';
 import { useFavoriteStore } from '@Stores';
 import { Image } from 'expo-image';
-import React, { useCallback, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, ScrollView } from 'react-native';
 import { Button, Divider, Surface, Text } from 'react-native-paper';
 
