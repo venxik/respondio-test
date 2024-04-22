@@ -1,10 +1,10 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {ActivityIndicator} from 'react-native-paper';
+import { View, Text, StyleSheet } from 'react-native';
+import { ActivityIndicator } from 'react-native-paper';
 
 const FlatlistLoading = () => {
   return (
-    <View style={styles.loadingIndicator}>
+    <View style={styles.loadingIndicator} testID="flatlist-loading">
       <ActivityIndicator size={30} />
     </View>
   );
@@ -12,5 +12,5 @@ const FlatlistLoading = () => {
 export default FlatlistLoading;
 
 const styles = StyleSheet.create({
-  loadingIndicator: {paddingVertical: 10, justifyContent: 'center'},
+  loadingIndicator: { paddingVertical: 10, justifyContent: 'center' },
 });

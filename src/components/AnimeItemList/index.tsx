@@ -1,16 +1,24 @@
-import {Image} from 'expo-image';
+import { Image } from 'expo-image';
 import React from 'react';
-import {AnimeItemListProps} from './model';
-import {StyleSheet, Text, View} from 'react-native';
-import {Card} from 'react-native-paper';
+import { AnimeItemListProps } from './model';
+import { StyleSheet, Text, View } from 'react-native';
+import { Card } from 'react-native-paper';
+import { useNavigation } from '@react-navigation/native';
 
-const AnimeItemList = ({data}: AnimeItemListProps) => {
+const blurhash =
+  '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
+
+const AnimeItemList = ({ data }: AnimeItemListProps) => {
+  const navigation = useNavigation();
   return (
-    <Card>
+    <Card
+      onPress={() => navigation.navigate('Details', { id: data.mal_id })}
+      testID="anime-item">
       <Card.Content style={styles.container}>
         <Image
           source={data.images.jpg.small_image_url}
-          style={{width: 60, height: 60, borderRadius: 60}}
+          style={{ width: 60, height: 60, borderRadius: 60 }}
+          placeholder={blurhash}
         />
         <View style={styles.rightContainer}>
           <Text style={styles.titleText}>{data.title ?? '-'}</Text>

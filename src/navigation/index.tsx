@@ -15,10 +15,12 @@ import {
 } from '@Screens';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { RootStackParamList } from '@Model/navigation';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
-const RootStack = createNativeStackNavigator();
+const RootStack = createNativeStackNavigator<RootStackParamList>();
 
 const TabBarItem = ({
   route,
@@ -92,16 +94,22 @@ const DrawerNavigator = () => {
 
 function AppNavigator() {
   return (
-    <NavigationContainer>
-      <RootStack.Navigator>
-        <RootStack.Screen
-          name="Drawer"
-          component={DrawerNavigator}
-          options={{ headerShown: false }}
-        />
-        <RootStack.Screen name="Details" component={DetailScreen} />
-      </RootStack.Navigator>
-    </NavigationContainer>
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <RootStack.Navigator screenOptions={{ headerBackTitleVisible: false }}>
+          <RootStack.Screen
+            name="Drawer"
+            component={DrawerNavigator}
+            options={{ headerShown: false }}
+          />
+          <RootStack.Screen
+            name="Details"
+            component={DetailScreen}
+            initialParams={{ id: 0 }}
+          />
+        </RootStack.Navigator>
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 }
 
